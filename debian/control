@@ -1,0 +1,15 @@
+Source: comarchcryptoprovider
+Section: utils
+Priority: optional
+Build-Depends: debhelper (>= 9), dh-systemd,
+ p7zip, ca-certificates, wget, tar
+Maintainer: Jacek Kowalski <Jacek@jacekk.info>
+
+Package: comarchcryptoprovider
+Architecture: amd64
+Section: utils
+Priority: optional
+Description: Utilitythat provides webservices used by Polish ePUAP
+ (Electronic Platform of Public Administration Services)
+ for electronic signature using cryptographic cards.
+Depends: ca-certificates, ${misc:Depends}, ${shlibs:Depends}

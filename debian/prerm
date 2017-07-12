@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ "$1" = "remove" ]
+then
+
+	INSTALLDIR="/usr/local/ComarchCryptoProvider"
+	
+	echo "Deleting generated certificates..."
+	
+	for i in "${INSTALLDIR}/certs/CCP-key-server.pem" \
+		"${INSTALLDIR}/certs/CCP-cert-server.pem" \
+		"${INSTALLDIR}/certs/CCP-req-server.pem" \
+		"${INSTALLDIR}/certs/CCP-cert-CA.cer" \
+		"${INSTALLDIR}/certs/CCP-cert-CA.pem" \
+		"${INSTALLDIR}/certs/CCP-cert-CA.srl" \
+		"${INSTALLDIR}/certs/CCP-key-CA.pem" \
+		"/usr/local/share/ca-certificates/CCP-cert-CA.crt"
+	do
+		[ -f "$i"  ] && rm -f "$i"
+	done
+	
+	dpkg-trigger update-ca-certificates
+
+fi
+
+#DEBHELPER#

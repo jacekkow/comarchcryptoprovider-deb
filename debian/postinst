@@ -1,0 +1,49 @@
+#!/bin/sh
+
+if [ "$1" = "configure" ]
+then
+
+	INSTALLDIR="/usr/local/ComarchCryptoProvider"
+	
+	if [ ! -f "${INSTALLDIR}/certs/CCP-key-server.pem" ] \
+		|| [ ! -f "${INSTALLDIR}/certs/CCP-key-server.pem" ] \
+		|| [ ! -f "${INSTALLDIR}/certs/CCP-cert-CA.cer" ]
+	then
+	
+		echo "Generating CA for localhost..."
+		openssl genrsa -out ${INSTALLDIR}/certs/CCP-key-CA.pem 2048
+		openssl req -x509 -sha256 -days 1000 -extensions ext-ca \
+			-subj "/C=PL/O=ComarchCryptoProvider/CN=ComarchCryptoProvider CA" \
+			-config "${INSTALLDIR}/openssl.cnf" \
+			-key "${INSTALLDIR}/certs/CCP-key-CA.pem" \
+			-out "${INSTALLDIR}/certs/CCP-cert-CA.pem"
+		openssl x509 -inform PEM -outform DER \
+			-in "${INSTALLDIR}/certs/CCP-cert-CA.pem" \
+			-out "${INSTALLDIR}/certs/CCP-cert-CA.cer"
+		
+		echo "Trust generated CA certificate..."
+		cp "${INSTALLDIR}/certs/CCP-cert-CA.pem" \
+			"/usr/local/share/ca-certificates/CCP-cert-CA.crt"
+		dpkg-trigger update-ca-certificates
+		
+		echo "Generating signed certificate for server..."
+		openssl genrsa -out ${INSTALLDIR}/certs/CCP-key-server.pem 2048
+		openssl req -new -sha256 \
+			-subj "/C=PL/O=ComarchCryptoProvider/CN=localhost" \
+			-out "${INSTALLDIR}/certs/CCP-req-server.pem" \
+			-key "${INSTALLDIR}/certs/CCP-key-server.pem"
+		openssl x509 -req -sha256 -days 999 -extensions ext-san \
+			-extfile "${INSTALLDIR}/openssl.cnf" \
+			-in "${INSTALLDIR}/certs/CCP-req-server.pem" \
+			-CA "${INSTALLDIR}/certs/CCP-cert-CA.pem" \
+			-CAkey "${INSTALLDIR}/certs/CCP-key-CA.pem" \
+			-CAcreateserial \
+			-out "${INSTALLDIR}/certs/CCP-cert-server.pem"
+		
+		chmod 644 "${INSTALLDIR}/certs/CCP-key-server.pem"
+	
+	fi
+
+fi
+
+#DEBHELPER#

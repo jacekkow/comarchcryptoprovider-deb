@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+
+NAME = ComarchCryptoProvider
+VERSION = 1.0
+PACKAGENAME = comarchcryptoprovider
+PACKAGEVERSION = $(VERSION)-0
+URL = https://epuap.gov.pl/signing/plugin/linux
+BASENAME = ComarchCryptoProvider-installer.sh
+TARBALL = ComarchCryptoProvider-installer
+
+%:
+	dh $@ --with systemd
+
+override_dh_usrlocal:
+override_dh_shlibdeps:
+	dh_shlibdeps -- -l"debian/$(PACKAGENAME)/usr/local/$(NAME)"
+override_dh_strip:
+
+override_dh_auto_clean:
+	rm -f "$(BASENAME)" "$(TARBALL)"
+	rm -f ccp-system "debian/$(PACKAGENAME).init"
+	rm -f ccp-system.service "debian/$(PACKAGENAME).service"
+override_dh_auto_build:
+	wget -N --progress=dot:mega "$(URL)/$(BASENAME)"
+	7z x "$(BASENAME)" -aoa
+	tar --strip-components=1 -xf "$(TARBALL)" ./ccp-system ./ccp-system.service
+	cp -f ccp-system "debian/$(PACKAGENAME).init"
+	cp -f ccp-system.service "debian/$(PACKAGENAME).service"
+override_dh_auto_install:
+	mkdir -p "debian/$(PACKAGENAME)/usr/local/$(NAME)" "debian/$(PACKAGENAME)/etc/X11/Xsession.d"
+	tar --strip-components=1 -xf "$(TARBALL)" --directory "debian/$(PACKAGENAME)/usr/local/$(NAME)/"
+	cp openssl.cnf "debian/$(PACKAGENAME)/usr/local/$(NAME)/"
+	cp Xsession-ccp "debian/$(PACKAGENAME)/etc/X11/Xsession.d/97ccp"
+	sha1sum debian/comarchcryptoprovider/usr/local/ComarchCryptoProvider/watchdog_service
+override_dh_auto_test:
+
+override_dh_gencontrol:
+	dh_gencontrol -- -v$(PACKAGEVERSION) 

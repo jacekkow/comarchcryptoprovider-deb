@@ -1,0 +1,22 @@
+[req]
+distinguished_name = req_distinguished_name
+
+[req_distinguished_name]
+
+[ext-ca]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+basicConstraints = critical, CA:TRUE
+keyUsage = digitalSignature, cRLSign, keyCertSign
+
+[ext-san]
+basicConstraints = critical, CA:FALSE
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth, clientAuth
+nsCertType = server
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
