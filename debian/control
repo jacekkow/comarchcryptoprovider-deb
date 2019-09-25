@@ -9,7 +9,7 @@ Package: comarchcryptoprovider
 Architecture: amd64
 Section: utils
 Priority: optional
-Description: Utilitythat provides webservices used by Polish ePUAP
+Description: Utility that provides webservices used by Polish ePUAP
  (Electronic Platform of Public Administration Services)
  for electronic signature using cryptographic cards.
 Depends: ca-certificates, ${misc:Depends}, ${shlibs:Depends}
